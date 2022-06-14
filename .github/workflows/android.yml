@@ -34,6 +34,6 @@ jobs:
         with:
           token: ${{ secrets.SLACK_BOT_TOKEN }}
           path: ${{ steps.staging.outputs.apkfile }}
-          channel: android-builds
+          channel: test-builds
           initial_comment: ${{ github.event.inputs.thingsToTest }}
         continue-on-error: true
