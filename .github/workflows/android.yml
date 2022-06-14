@@ -1,0 +1,30 @@
+name: Pre-release Staging Build
+on:
+  workflow_dispatch:
+    inputs:
+      thingsToTest:
+        description: 'Changelog - Things to be QA Tested'
+        required: true
+        type: string
+
+jobs:
+  build:
+    name: Building the pre-release staging and sending it to the QA team for testing
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkingout selected branch
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.ANDROID_GITHUB_TOKEN }}
+          submodules: recursive
+
+      - name: Granting gradlew permissions
+        run: chmod +x gradlew
+
+      - name: Building staging from selected branch
+        run: bash ./gradlew assembleDebug --stacktrace
+
+      - name: Get staging file path
+        id: staging
+        run: echo "::set-output name=apkfile::$(find app/build/outputs/apk/debug/*.apk)"
