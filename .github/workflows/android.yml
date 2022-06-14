@@ -28,3 +28,12 @@ jobs:
       - name: Get staging file path
         id: staging
         run: echo "::set-output name=apkfile::$(find app/build/outputs/apk/debug/*.apk)"
+        
+      - name: Send staging build to Slack
+        uses: adrey/slack-file-upload-action@master
+        with:
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          path: ${{ steps.staging.outputs.apkfile }}
+          channel: android-builds
+          initial_comment: ${{ github.event.inputs.thingsToTest }}
+        continue-on-error: true
