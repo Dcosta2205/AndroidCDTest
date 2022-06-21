@@ -1,0 +1,65 @@
+name: Feature Builds
+
+on:
+  pull_request_review:
+    branches:
+      - 'develop'
+    types: [ submitted ]
+
+jobs:
+  build:
+    name: Building the PR and sending it to the QA team for testing
+    runs-on: ubuntu-latest
+
+    steps:
+      - if: github.event.pull_request.base.ref == 'develop'
+        name: Getting Reviews
+        uses: buildsville/review-summary@v1
+        id: summary
+        with:
+          token: ${{ secrets.ANDROID_GITHUB_TOKEN }}
+
+      - if: github.event.pull_request.base.ref == 'develop'
+        name: Print Review Summary
+        run: |
+          echo "APPROVE: ${{ steps.summary.outputs.approved }}"
+          echo "REQUEST_CHANGES: ${{ steps.summary.outputs.changes_requested }}"
+          echo "COMMENT: ${{ steps.summary.outputs.commented }}"
+          echo "PENDING: ${{ steps.summary.outputs.pending }}"
+      - if: github.event.pull_request.base.ref == 'develop'
+        name: Generate slack message
+        id: slack
+        run: echo "::set-output name=message::${{ github.event.pull_request.title }}\n${{ github.event.pull_request.body }}"
+
+      - if: steps.summary.outputs.approved == 2 && github.event.pull_request.base.ref == 'develop'
+        name: Checkingout feature branch
+        uses: actions/checkout@v2
+
+      - if: steps.summary.outputs.approved == 2 && github.event.pull_request.base.ref == 'develop'
+        name: Getting PR Details
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+      - if: steps.summary.outputs.approved == 2 && github.event.pull_request.base.ref == 'develop'
+        name: Granting gradlew permissions
+        run: chmod +x gradlew
+
+      - if: steps.summary.outputs.approved == 2 && github.event.pull_request.base.ref == 'develop'
+        name: Building feature branch
+        run: bash ./gradlew assembleStaging --stacktrace
+
+      - if: steps.summary.outputs.approved == 2 && github.event.pull_request.base.ref == 'develop'
+        name: Get staging file path
+        id: staging
+        run: echo "::set-output name=apkfile::$(find app/build/outputs/apk/staging/*.apk)"
+
+      - if: steps.summary.outputs.approved == 2 && github.event.pull_request.base.ref == 'develop'
+        name: Send staging build to Slack
+        uses: adrey/slack-file-upload-action@master
+        with:
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          path: ${{ steps.staging.outputs.apkfile }}
+          channel: android-builds
+          initial_comment: ${{ steps.slack.outputs.message }}
+        continue-on-error: true
