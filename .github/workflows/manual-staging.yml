@@ -15,25 +15,22 @@ jobs:
     steps:
       - name: Checkingout selected branch
         uses: actions/checkout@v2
-#         with:
-#           token: ${{ secrets.ANDROID_GITHUB_TOKEN }}
-#           submodules: recursive
 
       - name: Granting gradlew permissions
         run: chmod +x gradlew
 
       - name: Building staging from selected branch
-        run: bash ./gradlew assembleDebug --stacktrace
+        run: bash ./gradlew assembleStaging --stacktrace
 
       - name: Get staging file path
         id: staging
-        run: echo "::set-output name=apkfile::$(find app/build/outputs/apk/debug/*.apk)"
-        
+        run: echo "::set-output name=apkfile::$(find app/build/outputs/apk/staging/*.apk)"
+
       - name: Send staging build to Slack
         uses: adrey/slack-file-upload-action@master
         with:
           token: ${{ secrets.SLACK_BOT_TOKEN }}
           path: ${{ steps.staging.outputs.apkfile }}
-          channel: test-builds
+          channel: android-builds
           initial_comment: ${{ github.event.inputs.thingsToTest }}
         continue-on-error: true
