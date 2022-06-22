@@ -26,6 +26,18 @@ android {
             storeFile = file("../ssup_staging")
             storePassword = "QwKF>b\\rYN83UWf="
         }
+        release {
+            storeFile file('/Users/lloyddcosta/android-cd.jks')
+            storePassword 'lloyd2205'
+            keyAlias 'lloyd'
+            keyPassword 'lloyd2205'
+        }
+        staging {
+            storeFile file('/Users/lloyddcosta/Desktop/ssup_staging')
+            storePassword 'QwKF>b\\rYN83UWf='
+            keyPassword 'QwKF>b\\rYN83UWf='
+            keyAlias 'ssup_staging'
+        }
     }
 
     buildTypes {
