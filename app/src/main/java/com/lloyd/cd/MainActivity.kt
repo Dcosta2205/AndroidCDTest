@@ -17,8 +17,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
 
-
-
             CDTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
