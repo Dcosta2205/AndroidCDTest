@@ -32,12 +32,6 @@ android {
             keyAlias 'lloyd'
             keyPassword 'lloyd2205'
         }
-        staging {
-            storeFile file('/Users/lloyddcosta/Desktop/ssup_staging')
-            storePassword 'QwKF>b\\rYN83UWf='
-            keyPassword 'QwKF>b\\rYN83UWf='
-            keyAlias 'ssup_staging'
-        }
     }
 
     buildTypes {
